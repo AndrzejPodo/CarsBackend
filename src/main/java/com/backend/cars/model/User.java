@@ -1,5 +1,6 @@
 package com.backend.cars.model;
 
+import com.backend.cars.validators.UniqueLogin;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -10,10 +11,14 @@ import java.util.Set;
 @Getter
 @Setter
 public class User {
+
     @Id
     @GeneratedValue
     private int user_id;
+
+    @UniqueLogin
     private String username;
+
     private String password;
 
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
