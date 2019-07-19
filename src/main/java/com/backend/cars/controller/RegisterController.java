@@ -2,24 +2,22 @@ package com.backend.cars.controller;
 
 
 import com.backend.cars.model.User;
+import com.backend.cars.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
-import com.backend.cars.repository.UserRepository;
+import org.springframework.web.bind.annotation.*;
 
 import javax.persistence.EntityManager;
-import javax.sql.DataSource;
 import javax.validation.Valid;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 
 @RestController
 @RequestMapping("/user")
 public class RegisterController {
 
     @Autowired
-    private UserRepository userRepository;
+    private UserService userService;
 
     @Autowired
     private EntityManager dataSource;
@@ -27,9 +25,17 @@ public class RegisterController {
     @Autowired
     private BCryptPasswordEncoder bCryptPasswordEncoder;
 
-    @PostMapping("/register")
-    public String register(@Valid @RequestBody User user){
-        userRepository.save(user);
-        return "User name: "+user.getUsername()+" Password: "+user.getPassword();
+    @PostMapping(value = "/register")
+    @ResponseBody
+    public HashMap<String, Object> register(@Valid @RequestBody User user){
+        HashMap<String, Object> response = new LinkedHashMap<String, Object>();
+
+        String pwd = user.getPassword();
+        String encryptPwd = bCryptPasswordEncoder.encode(pwd);
+        user.setPassword(encryptPwd);
+        userService.addUser(user);
+        response.put("success", 1);
+        //rtn.put("", user.getUsername());
+        return response;
     }
 }

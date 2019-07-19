@@ -10,9 +10,9 @@ import java.lang.annotation.Target;
 
 @Target({ElementType.METHOD, ElementType.FIELD})
 @Retention(RetentionPolicy.RUNTIME)
-@Constraint(validatedBy = UniqueLoginValidator.class)
-public @interface UniqueLogin {
-    String message() default "Username has to be unique.";
+@Constraint(validatedBy = UniqueEmailValidator.class)
+public @interface UniqueEmail {
+    String message() default "There is already user with such email!";
     Class<?>[] groups() default {};
     Class<? extends Payload>[] payload() default {};
 }

@@ -1,5 +1,6 @@
 package com.backend.cars.model;
 
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -17,4 +18,5 @@ public class Role {
     @GeneratedValue
     private int role_id;
     private String role;
+
 }
