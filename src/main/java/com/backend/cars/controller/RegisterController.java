@@ -7,7 +7,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
-import javax.persistence.EntityManager;
 import javax.validation.Valid;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -18,9 +17,6 @@ public class RegisterController {
 
     @Autowired
     private UserService userService;
-
-    @Autowired
-    private EntityManager dataSource;
 
     @Autowired
     private BCryptPasswordEncoder bCryptPasswordEncoder;
@@ -35,7 +31,6 @@ public class RegisterController {
         user.setPassword(encryptPwd);
         userService.addUser(user);
         response.put("success", 1);
-        //rtn.put("", user.getUsername());
         return response;
     }
 }
