@@ -13,10 +13,11 @@ import java.util.List;
 @Service
 public class UniqueEmailValidator implements ConstraintValidator<UniqueEmail, String> {
 
-    @Autowired
     private UserService userService;
 
-    public UniqueEmailValidator(){
+    @Autowired
+    public UniqueEmailValidator(UserService userService){
+        this.userService = userService;
     }
 
     @Override

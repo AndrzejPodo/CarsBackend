@@ -1,45 +1,45 @@
 package com.backend.cars.validation;
 
-import com.backend.cars.model.Role;
 import com.backend.cars.model.User;
+import com.backend.cars.service.UserService;
+import com.backend.cars.validators.UniqueEmailValidator;
 import org.junit.Assert;
-import org.junit.BeforeClass;
+import org.junit.Before;
 import org.junit.Test;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Profile;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.junit.MockitoJUnitRunner;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.Validation;
-import javax.validation.Validator;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.Optional;
 
+
+@RunWith(MockitoJUnitRunner.class)
 public class UserValidationTest {
 
-    private static Validator validator;
+    private UniqueEmailValidator uniqueEmailValidator;
 
-    @BeforeClass
-    public static void setupValidatorInstance(){
-        validator = Validation.buildDefaultValidatorFactory().getValidator();
+    @Mock
+    UserService userService;
+
+    @Before
+    public void setUp(){
+        this.uniqueEmailValidator = new UniqueEmailValidator(userService);
+        Mockito.when(userService.getUserByEmail("andrzej@gmail.com")).thenReturn(new User());
+        Mockito.when(userService.getUserByEmail("mati@gmail.com")).thenReturn(null);
     }
 
     @Test
-    public void correctUserTest(){
-        User user = new User();
-
-        Set<Role> notEmptySet = new HashSet<>();
-        Role userRole = new Role();
-        userRole.setRole("USER");
-        notEmptySet.add(userRole);
-
-
-        user.setPassword("abcd1234");//8 character password
-        user.setEmail("abcd@dhe.com");//correct email format
-        user.setUsername("alala");//not null user name
-        user.setRoles(notEmptySet);//not empty and not null set of roles
-
-        Set<ConstraintViolation<User>> violations = validator.validate(user);
-
-        Assert.assertEquals(0, violations.size());
+    public void whenEmailIsNotUnique(){
+        boolean violation = uniqueEmailValidator.isValid("andrzej@gmail.com", null);
+        Assert.assertEquals(false, violation);
     }
+
+    @Test
+    public void whenEmailIsUnique(){
+        boolean violation = uniqueEmailValidator.isValid("mati@gmail.com", null);
+        Assert.assertEquals(true, violation);
+    }
+
+
 }
