@@ -2,7 +2,6 @@ package com.backend.cars.service;
 
 import com.backend.cars.model.UserGroup;
 import com.backend.cars.model.User;
-import com.backend.cars.repository.GroupRepository;
 import com.backend.cars.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -15,10 +14,6 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private UserRepository userRepository;
-
-    @Autowired
-    private GroupRepository groupRepository;
-
 
     @Override
     public List<User> getUserByName(String name) {
@@ -44,26 +39,13 @@ public class UserServiceImpl implements UserService {
     @Override
     public Set<UserGroup> getGroupsThatUserBelongsTo(int id){
         User user = getUserById(id);
-        return user.getAsUserUserGroups();
+        return user.getGroups();
     }
 
     @Override
     public Set<UserGroup> getGroupsThatUserManages(int id){
         User user = getUserById(id);
-        return user.getAsAdminUserGroups();
+        return user.getManagedGroups();
     }
 
-    @Override
-    public UserGroup createGroup(int userId, String groupName){
-        UserGroup userGroup = new UserGroup();
-        userGroup.setGroupName(groupName);
-        User user = userRepository.getOne(userId);
-        Set<UserGroup> set = user.getAsAdminUserGroups();
-        set.add(userGroup);
-        user.setAsAdminUserGroups(set);
-        groupRepository.save(userGroup);
-        userRepository.saveAndFlush(user);
-        //return groupRepository.saveAndFlush(userGroup);
-        return userGroup;
-    }
 }

@@ -38,7 +38,7 @@ public class User {
 
     //set of groups that user belongs to as USER
     @ManyToMany
-    private Set<UserGroup> asUserUserGroups;
+    private Set<UserGroup> groups;
 
     @OneToMany
     @JoinTable(
@@ -46,6 +46,6 @@ public class User {
             joinColumns = @JoinColumn(name = "user_id"),
             inverseJoinColumns = @JoinColumn(name = "group_id")
     )
-    private Set<UserGroup> asAdminUserGroups;
+    private Set<UserGroup> managedGroups;
 
 }

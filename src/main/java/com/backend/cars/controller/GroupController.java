@@ -1,13 +1,21 @@
 package com.backend.cars.controller;
 
-import com.backend.cars.model.UserGroup;
 import com.backend.cars.model.User;
 import com.backend.cars.service.GroupService;
 import com.backend.cars.service.UserService;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/group")
@@ -21,31 +29,40 @@ public class GroupController {
 
     @GetMapping("/createGroup")
     @ResponseBody
-    public String createGroup(@RequestParam(name = "adminId") int adminId,@RequestParam(name = "groupName") String groupName){
-        userService.createGroup(adminId,groupName);
+    public String createGroup(@RequestParam(name = "groupName") String groupName){
+        try{
+            groupService.createGroup(groupName);
+        }catch (Exception e){
+            return e.getMessage();
+        }
         return "UserGroup "+groupName+" created!";
     }
 
-    @GetMapping("/getUsers")
+    @GetMapping(value = "/getUsers")
     @ResponseBody
-    public Set<User> getUsers(@RequestParam(name = "groupId") int groupId){
-        return groupService.getUsers(groupId);
+    public List<UserTemplate> getUsers(@RequestParam(name = "groupId") int groupId){
+        List<UserTemplate> users = groupService.getUsers(groupId).stream().
+                map(user -> new UserTemplate(user.getEmail(), user.getUser_id())).collect(Collectors.toList());
+        return users;
     }
 
     @GetMapping("/addUser")
     @ResponseBody
-    public String addUser(@RequestParam(name = "adminId") int adminId,@RequestParam(name = "userId") int userId, @RequestParam(name = "groupId") int groupId){
+    public String addUser(@RequestParam(name = "userId") int userId, @RequestParam(name = "groupId") int groupId){
         User user = userService.getUserById(userId);
-        User admin = userService.getUserById(adminId);
 
-        //checking if admin is actually admin od userGroup with id gropuId
-        Set<UserGroup> userGroups = admin.getAsAdminUserGroups();
-        UserGroup userGroup = groupService.getGroupById(groupId);
-        if(userGroups.contains(userGroup)) {
+        try {
             groupService.addUser(groupId, user);
             return "User added successfully";
-        }else {
-            return "User is not admin of that userGroup";
+        }catch (Exception e){
+            return e.getMessage();
         }
+    }
+    @Getter
+    @Setter
+    @AllArgsConstructor
+    private class UserTemplate{
+        private String email;
+        private int id;
     }
 }

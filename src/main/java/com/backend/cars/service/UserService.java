@@ -13,5 +13,4 @@ public interface UserService {
     User addUser(User user);
     Set<UserGroup> getGroupsThatUserBelongsTo(int id);
     Set<UserGroup> getGroupsThatUserManages(int id);
-    UserGroup createGroup(int userId, String groupName);
 }

@@ -4,6 +4,7 @@ import com.backend.cars.jwtsecurity.JwtTokenUtil;
 import com.backend.cars.model.User;
 import com.backend.cars.service.CustomUserDetailService;
 import com.backend.cars.service.CustomUserDetails;
+import com.backend.cars.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -14,6 +15,8 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.HashMap;
 
 
 @RestController
@@ -31,13 +34,15 @@ public class JwtLoginController {
 
     @PostMapping("/login")
     public ResponseEntity<?> userLogin(@RequestBody User user) throws Exception{
+
+        HashMap<String, String> response = new HashMap<>();
         authenticate(user.getEmail(), user.getPassword());
 
         final CustomUserDetails userDetails = userDetailService.loadUserByUsername(user.getEmail());
-
         final String token = jwtTokenUtil.generateToken(userDetails);
 
-        return ResponseEntity.ok(token);
+        response.put("token", token);
+        return ResponseEntity.ok(response);
     }
 
     private void authenticate(String email, String password) throws Exception{

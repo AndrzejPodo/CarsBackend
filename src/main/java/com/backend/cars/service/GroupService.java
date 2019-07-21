@@ -3,10 +3,11 @@ package com.backend.cars.service;
 import com.backend.cars.model.UserGroup;
 import com.backend.cars.model.User;
 
-import java.util.Set;
+import java.util.List;
 
 public interface GroupService {
-    Set<User> getUsers(int groupId);
-    void addUser(int groupId, User user);
+    List<User> getUsers(int groupId);
+    void addUser(int groupId, User user) throws Exception;
     UserGroup getGroupById(int groupId);
+    void createGroup(String groupName) throws Exception;
 }

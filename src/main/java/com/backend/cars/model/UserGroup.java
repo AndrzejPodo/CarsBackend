@@ -25,5 +25,5 @@ public class UserGroup {
             name="group_user",
             joinColumns = @JoinColumn(name = "group_id"),
             inverseJoinColumns = @JoinColumn(name = "user_id"))
-    private Set<User> usersAsUser;
+    private Set<User> users;
 }
