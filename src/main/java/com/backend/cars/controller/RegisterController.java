@@ -23,14 +23,13 @@ public class RegisterController {
 
     @PostMapping(value = "/register")
     @ResponseBody
-    public HashMap<String, Object> register(@Valid @RequestBody User user){
+    public String register(@Valid @RequestBody User user){
         HashMap<String, Object> response = new LinkedHashMap<String, Object>();
 
         String pwd = user.getPassword();
         String encryptPwd = bCryptPasswordEncoder.encode(pwd);
         user.setPassword(encryptPwd);
         userService.addUser(user);
-        response.put("success", 1);
-        return response;
+        return "User registered successfully!";
     }
 }
