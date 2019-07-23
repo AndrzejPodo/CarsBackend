@@ -13,7 +13,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 @RunWith(MockitoJUnitRunner.class)
 public class CustomUserDetailServiceTest {
-    //tested object
+    //tested class
     private CustomUserDetailService customUserDetailService;
 
     User notNullUser;
