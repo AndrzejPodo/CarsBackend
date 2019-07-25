@@ -82,7 +82,7 @@ public class CustomUserDetailsTest {
         expected.add(new SimpleGrantedAuthority("ROLE_USER"));
         customUserDetails = new CustomUserDetails();
         customUserDetails.setUser(user);
-        
+
         assertThat(customUserDetails.getAuthorities(), containsInAnyOrder(expected.toArray()));
     }
 

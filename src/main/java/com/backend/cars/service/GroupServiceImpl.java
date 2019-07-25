@@ -1,19 +1,26 @@
 package com.backend.cars.service;
 
+import com.backend.cars.exceptions.GroupManagementPermissionDeniedException;
+import com.backend.cars.exceptions.UserAlreadyInTheGroupException;
 import com.backend.cars.model.UserGroup;
 import com.backend.cars.model.User;
 import com.backend.cars.repository.GroupRepository;
 import com.backend.cars.repository.UserRepository;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 @Service
+@AllArgsConstructor
 public class GroupServiceImpl implements GroupService {
 
     @Autowired
@@ -21,9 +28,6 @@ public class GroupServiceImpl implements GroupService {
 
     @Autowired
     UserService userService;
-
-    @Autowired
-    UserRepository userRepository;
 
     @Override
     public List<User> getUsers(int groupId) {
@@ -36,9 +40,15 @@ public class GroupServiceImpl implements GroupService {
         User admin = userService.getUserByEmail(SecurityContextHolder.getContext().getAuthentication().getName());
         UserGroup userGroup = groupRepository.getOne(groupId);
 
-        if(!admin.getManagedGroups().contains(userGroup)) throw new Exception("User do not have permission to mange this group!");
+        //if admin is some way tries to add user to group to which he dont have rights
+        if(admin.getManagedGroups() == null || !admin.getManagedGroups().contains(userGroup))
+            throw new GroupManagementPermissionDeniedException("User do not have permission to mange this group!");
+
+        if(userService.getGroupsThatUserBelongsTo(user.getUser_id())!= null && userService.getGroupsThatUserBelongsTo(user.getUser_id()).contains(userGroup))
+            throw new UserAlreadyInTheGroupException("User is already in that group!");
 
         Set<User> set = userGroup.getUsers();
+        if(set == null) set = new HashSet<>();
         set.add(user);
         userGroup.setUsers(set);
 
@@ -50,16 +60,10 @@ public class GroupServiceImpl implements GroupService {
     }
 
     @Override
-    public void createGroup(String groupName) throws Exception{
+    public void createGroup(String groupName){
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
 
-        boolean hasUserRole = authentication.getAuthorities().stream()
-                .anyMatch(r -> r.getAuthority().equals("ROLE_ADMIN"));
-
         User creator = userService.getUserByEmail(authentication.getName());
-
-        //just in case spring filters where decepted
-        if(!hasUserRole) throw new Exception("User is not permitted to create a group!");
 
         UserGroup userGroup = new UserGroup();
         userGroup.setGroupName(groupName);
@@ -68,6 +72,6 @@ public class GroupServiceImpl implements GroupService {
         set.add(userGroup);
         creator.setManagedGroups(set);
         groupRepository.save(userGroup);
-        userRepository.saveAndFlush(creator);
+        userService.addUser(creator);
     }
 }

@@ -30,11 +30,8 @@ public class GroupController {
     @GetMapping("/createGroup")
     @ResponseBody
     public String createGroup(@RequestParam(name = "groupName") String groupName){
-        try{
-            groupService.createGroup(groupName);
-        }catch (Exception e){
-            return e.getMessage();
-        }
+        groupService.createGroup(groupName);
+
         return "UserGroup "+groupName+" created!";
     }
 
