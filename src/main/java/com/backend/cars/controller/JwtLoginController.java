@@ -4,7 +4,6 @@ import com.backend.cars.jwtsecurity.JwtTokenUtil;
 import com.backend.cars.model.User;
 import com.backend.cars.service.CustomUserDetailService;
 import com.backend.cars.service.CustomUserDetails;
-import com.backend.cars.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -33,16 +32,41 @@ public class JwtLoginController {
     private CustomUserDetailService userDetailService;
 
     @PostMapping("/login")
-    public ResponseEntity<?> userLogin(@RequestBody User user) throws Exception{
-
+    public ResponseEntity<?> userLogin(@RequestBody User user){
+        String token = new String();
         HashMap<String, String> response = new HashMap<>();
-        authenticate(user.getEmail(), user.getPassword());
+        try {
+            token = login(user.getEmail(), user.getPassword());
+        }catch (Exception e) {
+            return ResponseEntity.status(401).body("Authentication failed!");
+        }
+        response.put("token", token);
+        return ResponseEntity.ok(response);
+    }
+
+    @PostMapping("/loginAsAdmin")
+    public ResponseEntity<?> userLoginAsAdmin(@RequestBody User user){
+        String token = new String();
+        HashMap<String, String> response = new HashMap<>();
+        try {
+            token = login(user.getEmail(), user.getPassword());
+        }catch (Exception e){
+            ResponseEntity.status(401).body("Authentication failed!");
+        }
 
         final CustomUserDetails userDetails = userDetailService.loadUserByUsername(user.getEmail());
-        final String token = jwtTokenUtil.generateToken(userDetails);
+        if(!userDetails.getAuthorities().contains("ROLE_ADMIN")){
+            ResponseEntity.status(403).body("User does not have ADMIN role in system!");
+        }
 
         response.put("token", token);
         return ResponseEntity.ok(response);
+    }
+
+    private String login(String email, String password) throws Exception{
+        authenticate(email, password);
+        final CustomUserDetails userDetails = userDetailService.loadUserByUsername(email);
+        return jwtTokenUtil.generateToken(userDetails);
     }
 
     private void authenticate(String email, String password) throws Exception{

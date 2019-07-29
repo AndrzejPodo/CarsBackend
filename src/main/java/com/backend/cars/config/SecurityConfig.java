@@ -50,11 +50,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 // dont authenticate this particular request
                 .authorizeRequests().antMatchers("/user/register").permitAll().
                 and().authorizeRequests().antMatchers("/user/login").permitAll().
+                and().authorizeRequests().antMatchers("/user/loginAsAdmin").permitAll().
+                // /group endpoints are only permitted for users with ROLE_ADMIN
+                and().authorizeRequests().antMatchers("/group/**").hasAuthority("ROLE_ADMIN").
                 // all other requests need to be authenticated
-                        anyRequest().authenticated().and().
+                anyRequest().authenticated().
                 // make sure we use stateless session; session won't be used to
                 // store user's state.
-                        exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint).and().sessionManagement()
+                 and().exceptionHandling().authenticationEntryPoint(jwtAuthenticationEntryPoint).and().sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 
         // Add a filter to validate the tokens with every request

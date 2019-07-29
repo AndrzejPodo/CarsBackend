@@ -30,8 +30,15 @@ public class GroupServiceImpl implements GroupService {
     UserService userService;
 
     @Override
-    public List<User> getUsers(int groupId) {
+    public List<User> getUsers(int groupId) throws Exception {
+        User admin = userService.getUserByEmail(SecurityContextHolder.getContext().getAuthentication().getName());
         UserGroup userGroup = groupRepository.getOne(groupId);
+
+        //if admin is some way tries to add user to group to which he dont have rights
+        if(admin.getManagedGroups() == null || !admin.getManagedGroups().contains(userGroup))
+            throw new GroupManagementPermissionDeniedException("User do not have permission to mange this group!");
+
+
         return new ArrayList(userGroup.getUsers());
     }
 

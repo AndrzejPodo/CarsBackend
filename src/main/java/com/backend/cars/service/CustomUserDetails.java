@@ -22,6 +22,8 @@ public class CustomUserDetails implements UserDetails {
         return user.getRoles().stream().map(role -> new SimpleGrantedAuthority("ROLE_"+role.getRole())).collect(Collectors.toList());
     }
 
+    public int getUserId(){return user.getUser_id();}
+
     @Override
     public String getPassword() {
         return user.getPassword();

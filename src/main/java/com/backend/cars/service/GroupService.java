@@ -6,7 +6,7 @@ import com.backend.cars.model.User;
 import java.util.List;
 
 public interface GroupService {
-    List<User> getUsers(int groupId);
+    List<User> getUsers(int groupId) throws Exception;
     void addUser(int groupId, User user) throws Exception;
     UserGroup getGroupById(int groupId);
     void createGroup(String groupName);
